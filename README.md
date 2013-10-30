@@ -1,4 +1,5 @@
-fuzzylist
-=========
+Fuzzy List
+==========
 
-FuzzyList
+Fuzzy List repository.
+
