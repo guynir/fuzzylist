@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 600000
+      driver-class-name: org.postgresql.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/fuzzylist
+    username: postgres
+    password: postgres
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        format_sql: true
+    database: postgresql
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    open-in-view: false

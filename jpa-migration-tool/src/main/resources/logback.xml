@@ -1,0 +1,25 @@
+<configuration debug="false">
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} [%-5level] %logger{1} - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SQL_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.hibernate.SQL" additivity="false" >
+        <level value="DEBUG" />
+        <appender-ref ref="SQL_CONSOLE" />
+    </logger>
+
+    <root level="OFF">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
+

@@ -1,0 +1,19 @@
+#
+# Docker compose for Windows/Mac development environment
+#
+
+version: "3.8"
+services:
+  database:
+    image: library/postgres:13.4
+    ports:
+      - "5432:${POSTGRES_PORT}"
+    env_file:
+      - .env
+
+  http-router:
+    build:
+      context: ../http-router
+    ports:
+      - "80:80"
+
