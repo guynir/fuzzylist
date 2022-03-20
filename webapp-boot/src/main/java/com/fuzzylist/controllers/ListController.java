@@ -1,12 +1,10 @@
 package com.fuzzylist.controllers;
 
+import com.fuzzylist.models.ListEntity;
 import com.fuzzylist.models.ListTextEntity;
 import com.fuzzylist.services.ListManagementService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +39,15 @@ public class ListController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Fetch text records for a list.
+     *
+     * @param listKey    List key.
+     * @param startIndex Optional starting index (exclusive).
+     * @param limit      Optional number of texts to return. If no specified, uses {@link ListManagementService#PAGE_SIZE}.
+     * @param order      Optional sorting order (ASC/DESC). If omitted, defaults to 'ASC'. If value is invalid, ASC
+     * @return Response containing list of texts.
+     */
     @GetMapping(value = API_V1_PREFIX + "/list/{listKey}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ListPageRecord fetchListText(@PathVariable("listKey") String listKey,
                                         @RequestParam(name = "startAfter", required = false) Integer startIndex,
@@ -54,6 +61,30 @@ public class ListController {
         List<ListTextRecord> records = entries.stream().map(WebResponseFactory::toRecord).toList();
 
         return new ListPageRecord(records);
+    }
+
+    /**
+     * Creates a new list.
+     *
+     * @param request Request containing list information.
+     * @return List response containing only list key.
+     */
+    @PostMapping(value = API_V1_PREFIX + "/list/")
+    public ListRecord createList(@RequestBody CreateListRequest request) {
+        ListEntity listEntity = service.createList(request.title(),
+                request.leftToRight() != null ? request.leftToRight() : true);
+        return new ListRecord(listEntity.key, null, null);
+    }
+
+    /**
+     * Add a new text to a list.
+     *
+     * @param listKey List key.
+     * @param request Request containing the text.
+     */
+    @PostMapping(value = API_V1_PREFIX + "/list/{listKey}/")
+    public void addListText(@PathVariable("listKey") String listKey, @RequestBody AddTextRequest request) {
+        service.addListText(listKey, request.text());
     }
 
     /**

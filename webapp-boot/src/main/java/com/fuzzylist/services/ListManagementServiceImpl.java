@@ -59,7 +59,7 @@ public class ListManagementServiceImpl implements ListManagementService {
         assertLength(title, MIN_TEXT_LENGTH, MAX_TITLE_LENGTH, "Title");
         ListEntity newList = new ListEntity(listKeyGenerator.generate(), title, leftToRight);
         listEntityRepository.save(newList);
-        logger.info("Created new list: '{}' with key '{}'.", title, newList.key);
+        logger.info("Created a new list: '{}' with key '{}'.", title, newList.key);
 
         return newList;
     }
@@ -78,6 +78,8 @@ public class ListManagementServiceImpl implements ListManagementService {
         int index = listTextEntityRepository.findMaxListIndex(listKey).orElse(0) + 1;
         ListTextEntity newText = new ListTextEntity(list, index, text);
         listTextEntityRepository.save(newText);
+
+        logger.info("Added text (size: {}) to list '{}'.", text.length(), listKey);
 
         return newText;
     }

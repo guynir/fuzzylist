@@ -7,5 +7,5 @@ package com.fuzzylist.controllers;
  * @param title       List title.
  * @param leftToRight {@code true} - if list should be displayed from left-to-right, {@code false} if right-to-left.
  */
-public record ListRecord(String key, String title, boolean leftToRight) {
+public record ListRecord(String key, String title, Boolean leftToRight) {
 }
