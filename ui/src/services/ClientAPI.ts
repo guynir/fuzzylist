@@ -42,7 +42,6 @@ export function getList(listKey: string): Promise<AxiosResponse<ListDataResponse
 }
 
 export function createTextEntry(listKey: string, text: string): Promise<AxiosResponse> {
-    alert("Inside createTextEntry")
     return client.post("/list/" + listKey + "/", {
         text: text
     })

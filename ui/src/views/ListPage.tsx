@@ -55,14 +55,17 @@ class ListPageInternal extends React.Component<any, ListPageState> {
                                placeholder="[ Enter you text here ]"
                                autoFocus={true}
                                inputRef={this.inputBoxRef}
+                               onKeyUp={e => {
+                                   if (e.key == 'Enter') {
+                                       this.addText()
+                                   }
+                               }}
                         />
                     </div>
                     <div className="iconDiv">
                         <img src="/icons8-add-100.png"
                              alt="Click to add"
-                             onClick={() => {
-                                 addText(this.listKey, this.inputBoxRef.current.value).then(() => this.loadTextEntries())
-                             }}
+                             onClick={() => this.addText()}
                         />
                     </div>
                 </div>
@@ -74,6 +77,11 @@ class ListPageInternal extends React.Component<any, ListPageState> {
 
             </div>
         </div>);
+    }
+
+    private addText() {
+        addText(this.listKey, this.inputBoxRef.current.value).then(() => this.loadTextEntries())
+        this.inputBoxRef.current.value = ""
     }
 
     /**

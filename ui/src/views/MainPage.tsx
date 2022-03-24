@@ -37,6 +37,16 @@ export class WelcomePage extends React.Component<any, WelcomePageState> {
                                    placeholder="[ Enter you list title here ]"
                                    autoFocus={true}
                                    inputRef={this.inputBoxRef}
+                                   onKeyUp={e => {
+                                       if (e.key == 'Enter') {
+                                           createNewList(this.inputBoxRef.current.value, this.state.leftToRight, true).catch(reason => {
+                                               this.setState({
+                                                   errorMessage: reason.errorMessage
+                                               })
+                                           })
+                                           this.inputBoxRef.current.value = ""
+                                       }
+                                   }}
                             />
                         </div>
                         <div className="iconDiv">
@@ -48,6 +58,7 @@ export class WelcomePage extends React.Component<any, WelcomePageState> {
                                              errorMessage: reason.errorMessage
                                          })
                                      })
+                                     this.inputBoxRef.current.value = ""
                                  }}
                             />
                         </div>
