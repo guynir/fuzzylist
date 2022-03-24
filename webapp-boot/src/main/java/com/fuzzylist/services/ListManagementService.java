@@ -1,7 +1,7 @@
 package com.fuzzylist.services;
 
-import com.fuzzylist.models.ListEntity;
-import com.fuzzylist.models.ListTextEntity;
+import com.fuzzylist.models.ListHeaderEntity;
+import com.fuzzylist.models.ListEntryEntity;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public interface ListManagementService {
     /**
      * @return A list of all lists entries.
      */
-    List<ListEntity> fetchLists();
+    List<ListHeaderEntity> fetchLists();
 
     /**
      * Create a new list.
@@ -52,7 +52,7 @@ public interface ListManagementService {
      * @throws IllegalArgumentException If either <i>title</i> is {@code null}, or out of
      *                                  {@link #MIN_TITLE_LENGTH minimum} and {@link #MAX_TITLE_LENGTH maximum} range.
      */
-    ListEntity createList(String title, boolean leftToRight) throws IllegalArgumentException;
+    ListHeaderEntity createList(String title, boolean leftToRight) throws IllegalArgumentException;
 
     /**
      * Add a new text to a list.
@@ -64,7 +64,7 @@ public interface ListManagementService {
      *                                  <i>text</i> length is out of {@link #MIN_TEXT_LENGTH minimum} -
      *                                  {@link #MAX_TEXT_LENGTH maximum} range.
      */
-    ListTextEntity addListText(String listKey, String text) throws IllegalArgumentException, UnknownListException;
+    ListEntryEntity addListText(String listKey, String text) throws IllegalArgumentException, UnknownListException;
 
     /**
      * Fetch list texts.
@@ -74,12 +74,12 @@ public interface ListManagementService {
      * @param numberOfTexts       Optional number of texts to fetch. If {@code null}, {@link #PAGE_SIZE} is used.
      * @param orderIndexAscending {@code true} to order list in ascending order (based on the index field),
      *                            {@code false} if descending order.
-     * @return List of text entries.
+     * @return List metadata and text entries.
      * @throws IllegalArgumentException If <i>listKey</i> is {@code null}, <i>startIndex</i> is negative or
      *                                  <i>numberOfTexts</i> zero or negative.
      */
-    List<ListTextEntity> fetchListTexts(String listKey,
-                                        Integer startAfterIndex,
-                                        Integer numberOfTexts,
-                                        boolean orderIndexAscending) throws IllegalArgumentException;
+    ListEntries fetchListTexts(String listKey,
+                               Integer startAfterIndex,
+                               Integer numberOfTexts,
+                               boolean orderIndexAscending) throws IllegalArgumentException;
 }

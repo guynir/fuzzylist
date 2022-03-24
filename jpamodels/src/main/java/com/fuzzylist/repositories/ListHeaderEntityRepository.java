@@ -1,6 +1,6 @@
 package com.fuzzylist.repositories;
 
-import com.fuzzylist.models.ListEntity;
+import com.fuzzylist.models.ListHeaderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * JPA repository for {@link ListEntity} entity.
+ * JPA repository for {@link ListHeaderEntity} entity.
  *
  * @author Guy Raz Nir
  * @since 2022/03/15
  */
 @Repository
-public interface ListEntityRepository extends JpaRepository<ListEntity, Long> {
+public interface ListHeaderEntityRepository extends JpaRepository<ListHeaderEntity, Long> {
 
     /**
      * Find a list by its key.
@@ -23,7 +23,7 @@ public interface ListEntityRepository extends JpaRepository<ListEntity, Long> {
      * @param listKey List key.
      * @return List entity matching the key.
      */
-    @Query("FROM ListEntity WHERE key = :key")
-    Optional<ListEntity> findByKey(@Param("key") String listKey);
+    @Query("FROM ListHeaderEntity WHERE key = :key")
+    Optional<ListHeaderEntity> findByKey(@Param("key") String listKey);
 
 }

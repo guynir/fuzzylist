@@ -6,8 +6,8 @@ import com.fuzzylist.common.ObjectBagAware;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "list")
-public class ListEntity extends ObjectBagAware {
+@Table(name = "list_header")
+public class ListHeaderEntity extends ObjectBagAware {
 
     /**
      * Primary key.
@@ -37,7 +37,7 @@ public class ListEntity extends ObjectBagAware {
     /**
      * Class constructor.
      */
-    public ListEntity() {
+    public ListHeaderEntity() {
     }
 
     /**
@@ -47,7 +47,7 @@ public class ListEntity extends ObjectBagAware {
      * @param title       Title.
      * @param leftToRight Indicator of LTR or RTL.
      */
-    public ListEntity(String key, String title, boolean leftToRight) {
+    public ListHeaderEntity(String key, String title, boolean leftToRight) {
         this.key = key;
         this.title = title;
         this.leftToRight = leftToRight;

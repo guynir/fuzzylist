@@ -1,7 +1,11 @@
 package com.fuzzylist.controllers;
 
-import com.fuzzylist.models.ListEntity;
-import com.fuzzylist.models.ListTextEntity;
+import com.fuzzylist.models.ListHeaderEntity;
+import com.fuzzylist.models.ListEntryEntity;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Generate web responses from a given internal entities.
@@ -11,11 +15,15 @@ import com.fuzzylist.models.ListTextEntity;
  */
 public class WebResponseFactory {
 
-    public static ListRecord toRecord(ListEntity entity) {
-        return new ListRecord(entity.key, entity.title, entity.leftToRight);
+    public static HeaderResponse toRecord(ListHeaderEntity entity) {
+        return new HeaderResponse(entity.key, entity.title, entity.leftToRight);
     }
 
-    public static ListTextRecord toRecord(ListTextEntity entity) {
-        return new ListTextRecord(entity.id, entity.index, entity.text);
+    public static EntryResponse toRecord(ListEntryEntity entity) {
+        return new EntryResponse(entity.id, entity.index, entity.text);
+    }
+
+    public static List<EntryResponse> toRecord(Collection<ListEntryEntity> entities) {
+        return entities.stream().map(WebResponseFactory::toRecord).collect(Collectors.toList());
     }
 }

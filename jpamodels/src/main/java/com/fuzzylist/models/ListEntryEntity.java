@@ -5,8 +5,8 @@ import com.fuzzylist.common.ObjectBag;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "list_text", uniqueConstraints = @UniqueConstraint(columnNames = {"parent_id", "index"}))
-public class ListTextEntity extends ObjectBagAware {
+@Table(name = "list_entry", uniqueConstraints = @UniqueConstraint(columnNames = {"parent_id", "index"}))
+public class ListEntryEntity extends ObjectBagAware {
 
     /**
      * Primary key.
@@ -20,7 +20,7 @@ public class ListTextEntity extends ObjectBagAware {
      */
     @ManyToOne
     @JoinColumn(nullable = false)
-    public ListEntity parent;
+    public ListHeaderEntity parent;
 
     /**
      * Index of text within the table.
@@ -37,7 +37,7 @@ public class ListTextEntity extends ObjectBagAware {
     /**
      * Class constructor.
      */
-    public ListTextEntity() {
+    public ListEntryEntity() {
     }
 
     /**
@@ -47,7 +47,7 @@ public class ListTextEntity extends ObjectBagAware {
      * @param index  Index of text within the list.
      * @param text   Text.
      */
-    public ListTextEntity(ListEntity parent, Integer index, String text) {
+    public ListEntryEntity(ListHeaderEntity parent, Integer index, String text) {
         this.parent = parent;
         this.index = index;
         this.text = text;

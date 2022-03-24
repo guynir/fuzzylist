@@ -1,10 +1,10 @@
 package com.fuzzylist.services;
 
 import com.fuzzylist.common.id.IdGenerator;
-import com.fuzzylist.models.ListEntity;
-import com.fuzzylist.models.ListTextEntity;
-import com.fuzzylist.repositories.ListEntityRepository;
-import com.fuzzylist.repositories.ListTextEntityRepository;
+import com.fuzzylist.models.ListHeaderEntity;
+import com.fuzzylist.models.ListEntryEntity;
+import com.fuzzylist.repositories.ListHeaderEntityRepository;
+import com.fuzzylist.repositories.ListEntryEntityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,9 +26,9 @@ public class ListManagementServiceImpl implements ListManagementService {
 
     private final IdGenerator listKeyGenerator;
 
-    private final ListEntityRepository listEntityRepository;
+    private final ListHeaderEntityRepository listHeaderEntityRepository;
 
-    private final ListTextEntityRepository listTextEntityRepository;
+    private final ListEntryEntityRepository listEntryEntityRepository;
 
     /**
      * Class logger.
@@ -38,27 +39,27 @@ public class ListManagementServiceImpl implements ListManagementService {
      * Class constructor.
      */
     public ListManagementServiceImpl(@Qualifier("listKeyGenerator") IdGenerator listKeyGenerator,
-                                     ListEntityRepository listEntityRepository,
-                                     ListTextEntityRepository listTextEntityRepository) {
+                                     ListHeaderEntityRepository listHeaderEntityRepository,
+                                     ListEntryEntityRepository listEntryEntityRepository) {
         this.listKeyGenerator = listKeyGenerator;
-        this.listEntityRepository = listEntityRepository;
-        this.listTextEntityRepository = listTextEntityRepository;
+        this.listHeaderEntityRepository = listHeaderEntityRepository;
+        this.listEntryEntityRepository = listEntryEntityRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ListEntity> fetchLists() {
-        return listEntityRepository.findAll();
+    public List<ListHeaderEntity> fetchLists() {
+        return listHeaderEntityRepository.findAll();
     }
 
     @Override
     @Transactional
-    public ListEntity createList(String title, boolean leftToRight) throws IllegalArgumentException {
+    public ListHeaderEntity createList(String title, boolean leftToRight) throws IllegalArgumentException {
         Assert.notNull(title, "Title cannot be null.");
 
         assertLength(title, MIN_TEXT_LENGTH, MAX_TITLE_LENGTH, "Title");
-        ListEntity newList = new ListEntity(listKeyGenerator.generate(), title, leftToRight);
-        listEntityRepository.save(newList);
+        ListHeaderEntity newList = new ListHeaderEntity(listKeyGenerator.generate(), title, leftToRight);
+        listHeaderEntityRepository.save(newList);
         logger.info("Created a new list: '{}' with key '{}'.", title, newList.key);
 
         return newList;
@@ -66,18 +67,18 @@ public class ListManagementServiceImpl implements ListManagementService {
 
     @Override
     @Transactional
-    public ListTextEntity addListText(String listKey, String text)
+    public ListEntryEntity addListText(String listKey, String text)
             throws IllegalArgumentException, UnknownListException {
         // No need to test 'listKey' for null. It is done by 'fetchList'.
         Assert.notNull(text, "Text cannot be null.");
         assertLength(text, MIN_TEXT_LENGTH, MAX_TEXT_LENGTH, "Text");
 
         // Fetch the list. It also makes to to assert the list exists.
-        ListEntity list = fetchList(listKey);
+        ListHeaderEntity list = fetchList(listKey);
 
-        int index = listTextEntityRepository.findMaxListIndex(listKey).orElse(0) + 1;
-        ListTextEntity newText = new ListTextEntity(list, index, text);
-        listTextEntityRepository.save(newText);
+        int index = listEntryEntityRepository.findMaxListIndex(listKey).orElse(0) + 1;
+        ListEntryEntity newText = new ListEntryEntity(list, index, text);
+        listEntryEntityRepository.save(newText);
 
         logger.info("Added text (size: {}) to list '{}'.", text.length(), listKey);
 
@@ -86,12 +87,12 @@ public class ListManagementServiceImpl implements ListManagementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ListTextEntity> fetchListTexts(String listKey,
-                                               Integer startAfterIndex,
-                                               Integer numberOfTexts,
-                                               boolean orderIndexAscending) throws IllegalArgumentException {
+    public ListEntries fetchListTexts(String listKey,
+                                      Integer startAfterIndex,
+                                      Integer numberOfTexts,
+                                      boolean orderIndexAscending) throws IllegalArgumentException {
         // Fetch list just to make sure it exists.
-        fetchList(listKey);
+        ListHeaderEntity listHeaderEntity = fetchList(listKey);
         if (numberOfTexts == null) {
             numberOfTexts = ListManagementService.PAGE_SIZE;
         }
@@ -101,7 +102,8 @@ public class ListManagementServiceImpl implements ListManagementService {
                 listKey,
                 orderIndexAscending ? "ASCENDING" : "DESCENDING",
                 startAfterIndex != null ? startAfterIndex : "n/a");
-        return listTextEntityRepository.fetchTextEntries(listKey, startAfterIndex, numberOfTexts, orderIndexAscending);
+        List<ListEntryEntity> entries = listEntryEntityRepository.fetchEntries(listKey, startAfterIndex, numberOfTexts, orderIndexAscending);
+        return new ListEntries(listHeaderEntity, new ArrayList<>(entries));
     }
 
     /**
@@ -112,9 +114,9 @@ public class ListManagementServiceImpl implements ListManagementService {
      * @throws IllegalArgumentException If <i>listKey</i> is {@code null}.
      * @throws UnknownListException     If list does not exist.
      */
-    protected ListEntity fetchList(String listKey) throws IllegalArgumentException, UnknownListException {
+    protected ListHeaderEntity fetchList(String listKey) throws IllegalArgumentException, UnknownListException {
         Assert.notNull(listKey, "List key cannot be null.");
-        return listEntityRepository.findByKey(listKey)
+        return listHeaderEntityRepository.findByKey(listKey)
                 .orElseThrow(() -> new UnknownListException("Unknown list: " + listKey));
     }
 

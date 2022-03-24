@@ -7,5 +7,5 @@ package com.fuzzylist.controllers;
  * @param index Index within the list of this text.
  * @param text  The text.
  */
-public record ListTextRecord(long id, int index, String text) {
+public record EntryResponse(long id, int index, String text) {
 }

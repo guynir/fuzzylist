@@ -1,7 +1,7 @@
 package com.fuzzylist.controllers;
 
-import com.fuzzylist.models.ListEntity;
-import com.fuzzylist.models.ListTextEntity;
+import com.fuzzylist.models.ListHeaderEntity;
+import com.fuzzylist.services.ListEntries;
 import com.fuzzylist.services.ListManagementService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.fuzzylist.controllers.ControllerConstants.API_V1_PREFIX;
+import static com.fuzzylist.controllers.WebResponseFactory.toRecord;
 
 /**
  * Spring REST controller for accessing lists and list text entries.
@@ -33,9 +34,9 @@ public class ListController {
      * @return List of all available lists in the server.
      */
     @GetMapping(value = API_V1_PREFIX + "/list/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ListRecord> fetchLists() {
+    public List<HeaderResponse> fetchLists() {
         return service.fetchLists()
-                .stream().map(e -> new ListRecord(e.key, e.title, e.leftToRight))
+                .stream().map(e -> new HeaderResponse(e.key, e.title, e.leftToRight))
                 .collect(Collectors.toList());
     }
 
@@ -49,18 +50,15 @@ public class ListController {
      * @return Response containing list of texts.
      */
     @GetMapping(value = API_V1_PREFIX + "/list/{listKey}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ListPageRecord fetchListText(@PathVariable("listKey") String listKey,
-                                        @RequestParam(name = "startAfter", required = false) Integer startIndex,
-                                        @RequestParam(name = "limit", required = false) Integer limit,
-                                        @RequestParam(name = "order", required = false, defaultValue = "ASC") String order) {
+    public ListDataResponse fetchListText(@PathVariable("listKey") String listKey,
+                                          @RequestParam(name = "startAfter", required = false) Integer startIndex,
+                                          @RequestParam(name = "limit", required = false) Integer limit,
+                                          @RequestParam(name = "order", required = false, defaultValue = "ASC") String order) {
         // Fetch list entries.
         boolean ascending = parseOrder(order);
-        List<ListTextEntity> entries = service.fetchListTexts(listKey, startIndex, limit, ascending);
+        ListEntries entries = service.fetchListTexts(listKey, startIndex, limit, ascending);
 
-        // Translate response to web records.
-        List<ListTextRecord> records = entries.stream().map(WebResponseFactory::toRecord).toList();
-
-        return new ListPageRecord(records);
+        return new ListDataResponse(toRecord(entries.listHeaderEntity()), toRecord(entries.entries()));
     }
 
     /**
@@ -70,10 +68,10 @@ public class ListController {
      * @return List response containing only list key.
      */
     @PostMapping(value = API_V1_PREFIX + "/list/")
-    public ListRecord createList(@RequestBody CreateListRequest request) {
-        ListEntity listEntity = service.createList(request.title(),
+    public HeaderResponse createList(@RequestBody CreateListRequest request) {
+        ListHeaderEntity listHeaderEntity = service.createList(request.title(),
                 request.leftToRight() != null ? request.leftToRight() : true);
-        return new ListRecord(listEntity.key, null, null);
+        return new HeaderResponse(listHeaderEntity.key, null, null);
     }
 
     /**

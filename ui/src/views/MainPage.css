@@ -1,0 +1,56 @@
+.mainPageTitle {
+    text-align: center;
+    padding-top: 25px;
+}
+
+.mainPageInputContainer {
+    text-align: center;
+    padding-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mainPageInputContainer div img {
+    width: 25px;
+    margin-top: 15px;
+    opacity: 0.4;
+    padding-left: 6px;
+}
+
+.mainPageInputMessage {
+    color: red;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mainPageInputMessage > div {
+    width: 430px;
+    text-align: left;
+    font-size: 0.8em;
+}
+
+.mainPageInputContainer div img:hover {
+    opacity: 0.8;
+}
+
+.mainPageInputContainer div img:active {
+    opacity: 1.0;
+}
+
+.directionSelectionDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+h1 {
+    font-family: 'Aladin', cursive;
+    font-size: 5em;
+}
+
+h2 {
+    font-family: 'Pompiere', cursive;
+    font-size: 2em;
+}

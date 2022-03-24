@@ -1,0 +1,44 @@
+h1 {
+    font-family: 'Noto Serif', serif;
+}
+
+h2 {
+    font-family: 'Noto Serif', serif;
+}
+
+.leftToRight {
+    direction: ltr;
+    float: left;
+}
+
+.rightToLeft {
+    direction: rtl;
+    float: right;
+}
+
+.listContainer {
+    width: 400px;
+}
+
+.addEntryDiv {
+    display: flex;
+}
+
+.iconDiv img:hover {
+    opacity: 0.8;
+}
+
+.iconDiv img:active {
+    opacity: 1.0;
+}
+
+.iconDiv img {
+    width: 25px;
+    margin-top: 5px;
+    opacity: 0.4;
+    padding-left: 6px;
+}
+
+.existingEntriesDiv {
+    padding-top: 10px;
+}
