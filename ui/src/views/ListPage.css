@@ -1,44 +1,31 @@
-h1 {
-    font-family: 'Noto Serif', serif;
+.list-container {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
 }
 
-h2 {
-    font-family: 'Noto Serif', serif;
-}
-
-.leftToRight {
+.left-to-right {
     direction: ltr;
     float: left;
 }
 
-.rightToLeft {
+.right-to-left {
     direction: rtl;
     float: right;
 }
 
-.listContainer {
-    width: 400px;
+.list-title {
+    font-size: 2em;
+    font-family: 'Noto Serif', serif;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
-.addEntryDiv {
+.add-text-entry {
     display: flex;
 }
 
-.iconDiv img:hover {
-    opacity: 0.8;
-}
-
-.iconDiv img:active {
-    opacity: 1.0;
-}
-
-.iconDiv img {
-    width: 25px;
-    margin-top: 5px;
-    opacity: 0.4;
-    padding-left: 6px;
-}
-
-.existingEntriesDiv {
+.existing-entries-container {
     padding-top: 10px;
 }

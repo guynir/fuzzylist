@@ -1,10 +1,10 @@
 import React, {MutableRefObject} from "react";
 import {getList, ListDataResponse, HeaderResponse, EntryResponse} from "../services/ClientAPI";
 import "./ListPage.css"
-import {Input} from "@mui/material";
 import {addText} from "../services/ListManagement";
 import {withRouter} from "./react-utils";
 import {AxiosResponse} from "axios";
+import InputBoxWithButton from "../components/InputBoxWithButton";
 
 /**
  * List page state.
@@ -39,46 +39,48 @@ class ListPageInternal extends React.Component<any, ListPageState> {
         this.inputBoxRef = React.createRef()
     }
 
+    /**
+     * After component added to DOM, load entries from server side.
+     */
     componentDidMount() {
-        this.loadTextEntries()
+        this.loadTextEntries().catch(() => {
+            alert("Error on loading page.")
+        })
     }
 
     render() {
-        return (<div className={"listContainer " + (this.state.header.leftToRight ? "leftToRight" : "rightToLeft")}>
-            <h2>
-                {this.state.header.title}
-            </h2>
-            <div className="entriesDiv ">
-                <div className="addEntryDiv">
-                    <div className="inputBoxDiv">
-                        <Input style={{width: "400px"}}
-                               placeholder="[ Enter you text here ]"
-                               autoFocus={true}
-                               inputRef={this.inputBoxRef}
-                               onKeyUp={e => {
-                                   if (e.key == 'Enter') {
-                                       this.addText()
-                                   }
-                               }}
-                        />
-                    </div>
-                    <div className="iconDiv">
-                        <img src="/icons8-add-100.png"
-                             alt="Click to add"
-                             onClick={() => this.addText()}
-                        />
-                    </div>
+        return (
+            <div className={"list-container " + (this.state.header.leftToRight ? "left-to-right" : "right-to-left")}>
+                <div className="back-home-link">
+                    <a href="/">&lt;&lt; Home</a>
                 </div>
-                <div className="existingEntriesDiv">
-                    {this.state.entries?.map((entry) => {
-                        return <div key={"entry_" + entry.index}>{entry.index}. {entry.text}</div>
-                    })}
+                <div className="list-title">
+                    {this.state.header.title}
                 </div>
+                <div className="entries-wrapper">
+                    <div className="add-text-entry">
+                        <div className="inputBoxDiv">
+                            <InputBoxWithButton style={{width: "400px"}}
+                                                placeholder="[ Enter you text here ]"
+                                                autoFocus={true}
+                                                inputRef={this.inputBoxRef}
+                                                onSubmit={() => this.addText()}
+                            />
+                        </div>
+                    </div>
+                    <div className="existing-entries-container">
+                        {this.state.entries?.map((entry) => {
+                            return <div key={"entry_" + entry.index}>{entry.index}. {entry.text}</div>
+                        })}
+                    </div>
 
-            </div>
-        </div>);
+                </div>
+            </div>);
     }
 
+    /**
+     * Add new text to the list -- submit text entry to the server.
+     */
     private addText() {
         addText(this.listKey, this.inputBoxRef.current.value).then(() => this.loadTextEntries())
         this.inputBoxRef.current.value = ""

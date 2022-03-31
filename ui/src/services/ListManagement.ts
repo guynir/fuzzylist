@@ -14,6 +14,7 @@ export class ValidationError {
 
 export function createNewList(listName: string, leftToRight: boolean, autoRedirect: boolean = false):
     Promise<AxiosResponse<HeaderResponse> | ValidationError> {
+
     if (listName === null || listName === undefined || listName.length === 0) {
         return Promise.reject(new ValidationError("Missing list name."))
     }
