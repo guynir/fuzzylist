@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "5de89403-620a-470c-b014-7317491f4ea5",
+		"name": "Fuzzy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2465263"
+	},
+	"item": [
+		{
+			"name": "Lists",
+			"item": [
+				{
+					"name": "Fetch all lists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/v1/list/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"list",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch list items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost/api/v1/list/hqnSgHmHaDtNWwGpx64PXdmgbKcQPkbH/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"list",
+								"hqnSgHmHaDtNWwGpx64PXdmgbKcQPkbH",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add list item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"What a wownderful world !!!!!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost/api/v1/list/hqnSgHmHaDtNWwGpx64PXdmgbKcQPkbH/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"list",
+								"hqnSgHmHaDtNWwGpx64PXdmgbKcQPkbH",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new list",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"A new list\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost/api/v1/list/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"path": [
+								"api",
+								"v1",
+								"list",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

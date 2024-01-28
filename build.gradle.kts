@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    runtimeOnly("org.postgresql:postgresql:42.2.23")
+    runtimeOnly("org.postgresql:postgresql:42.5.1")
 }
 
 //

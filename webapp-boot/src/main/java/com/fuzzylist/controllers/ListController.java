@@ -19,6 +19,7 @@ import static com.fuzzylist.controllers.WebResponseFactory.toRecord;
  * @since 2022/03/17
  */
 @RestController
+@RequestMapping(API_V1_PREFIX)
 public class ListController {
 
     private final ListManagementService service;
@@ -33,7 +34,7 @@ public class ListController {
     /**
      * @return List of all available lists in the server.
      */
-    @GetMapping(value = API_V1_PREFIX + "/list/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/list/", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<HeaderResponse> fetchLists() {
         return service.fetchLists()
                 .stream().map(e -> new HeaderResponse(e.key, e.title, e.leftToRight))
@@ -49,7 +50,7 @@ public class ListController {
      * @param order      Optional sorting order (ASC/DESC). If omitted, defaults to 'ASC'. If value is invalid, ASC
      * @return Response containing list of texts.
      */
-    @GetMapping(value = API_V1_PREFIX + "/list/{listKey}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/list/{listKey}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ListDataResponse fetchListText(@PathVariable("listKey") String listKey,
                                           @RequestParam(name = "startAfter", required = false) Integer startIndex,
                                           @RequestParam(name = "limit", required = false) Integer limit,
@@ -67,7 +68,7 @@ public class ListController {
      * @param request Request containing list information.
      * @return List response containing only list key.
      */
-    @PostMapping(value = API_V1_PREFIX + "/list/")
+    @PostMapping(value =  "/list/")
     public HeaderResponse createList(@RequestBody CreateListRequest request) {
         ListHeaderEntity listHeaderEntity = service.createList(request.title(),
                 request.leftToRight() != null ? request.leftToRight() : true);
@@ -80,7 +81,7 @@ public class ListController {
      * @param listKey List key.
      * @param request Request containing the text.
      */
-    @PostMapping(value = API_V1_PREFIX + "/list/{listKey}/")
+    @PostMapping(value =  "/list/{listKey}/")
     public void addListText(@PathVariable("listKey") String listKey, @RequestBody AddTextRequest request) {
         service.addListText(listKey, request.text());
     }

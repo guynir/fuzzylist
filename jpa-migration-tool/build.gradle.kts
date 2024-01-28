@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.jpamodels)
+    implementation(project(":jpamodels"))
 
     //
     // Spring framework.

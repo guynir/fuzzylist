@@ -2,21 +2,14 @@ plugins {
     id("java-spring-boot")
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
-
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.spring.io/milestone") }
 }
 
 dependencies {
-    implementation(projects.common)
-    implementation(projects.jpamodels)
-
+    implementation(project(":common"))
+    implementation(project(":jpamodels"))
 
     //
     // Spring framework artifacts.

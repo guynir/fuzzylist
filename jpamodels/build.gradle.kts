@@ -3,7 +3,8 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.common)
+    implementation(project(":common"))
+
     implementation("org.springframework.data:spring-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
