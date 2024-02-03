@@ -4,6 +4,7 @@ import com.fuzzylist.models.ListHeaderEntity;
 import com.fuzzylist.services.ListEntries;
 import com.fuzzylist.services.ListManagementService;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,10 +69,17 @@ public class ListController {
      * @param request Request containing list information.
      * @return List response containing only list key.
      */
-    @PostMapping(value =  "/list/")
-    public HeaderResponse createList(@RequestBody CreateListRequest request) {
-        ListHeaderEntity listHeaderEntity = service.createList(request.title(),
-                request.leftToRight() != null ? request.leftToRight() : true);
+    @PostMapping(value = "/list/")
+    public HeaderResponse createList(@RequestBody CreateListRequest request) throws BadRequestException {
+        String title = request.title();
+        boolean leftToRight = request.leftToRight() != null ? request.leftToRight() : true;
+
+        if (!StringUtils.hasText(title)) {
+            throw new BadRequestException("Missing 'title' property.");
+        }
+
+        ListHeaderEntity listHeaderEntity = service.createList(title, leftToRight);
+
         return new HeaderResponse(listHeaderEntity.key, null, null);
     }
 
@@ -81,7 +89,7 @@ public class ListController {
      * @param listKey List key.
      * @param request Request containing the text.
      */
-    @PostMapping(value =  "/list/{listKey}/")
+    @PostMapping(value = "/list/{listKey}/")
     public void addListText(@PathVariable("listKey") String listKey, @RequestBody AddTextRequest request) {
         service.addListText(listKey, request.text());
     }

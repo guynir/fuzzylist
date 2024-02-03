@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.QueryLookupStrategy;
 public class Application {
 
     public static void main(String[] args) {
-        //noinspection resource
         SpringApplication.run(Application.class, args);
     }
 }
