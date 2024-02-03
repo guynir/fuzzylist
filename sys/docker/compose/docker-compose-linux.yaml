@@ -2,7 +2,7 @@
 # Docker compose for Windows/Mac development environment
 #
 
-version: "3.2"
+version: "3.8"
 services:
   database:
     image: library/postgres:16.1
@@ -16,8 +16,5 @@ services:
       context: ../http-router
     ports:
       - "80:80"
-    network_mode: host
     extra_hosts:
-      - "host.docker.internal: 127.0.0.1"
-
-
+      - "host.docker.internal:host-gateway"
