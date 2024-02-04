@@ -12,6 +12,8 @@ plugins {
     id("org.flywaydb.flyway") version "8.0.0-beta3"
     id("com.nocwriter.runsql") version "1.0.3"
     id("java")
+
+    id("com.avast.gradle.docker-compose") version "0.17.6"
 }
 
 repositories {
@@ -20,6 +22,12 @@ repositories {
 
 dependencies {
     runtimeOnly("org.postgresql:postgresql:42.5.1")
+}
+
+dockerCompose {
+    useComposeFiles.set(listOf("sys/docker/compose/docker-compose-windows-mac.yaml"))
+    setProjectName("fuzzylist")
+    buildBeforeUp.set(false)
 }
 
 //
@@ -109,3 +117,4 @@ fun isDevelopmentProfile(): Boolean {
     return project.hasProperty("env") &&
             (project.property("env") as String).equals("dev", ignoreCase = true)
 }
+
