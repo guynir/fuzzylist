@@ -57,7 +57,7 @@ public class ListManagementServiceImpl implements ListManagementService {
     public ListHeaderEntity createList(String title, boolean leftToRight) throws IllegalArgumentException {
         Assert.notNull(title, "Title cannot be null.");
 
-        assertLength(title, MIN_TEXT_LENGTH, MAX_TITLE_LENGTH, "Title");
+        assertLength(title, MIN_TITLE_LENGTH, MAX_TITLE_LENGTH, "Title");
         ListHeaderEntity newList = new ListHeaderEntity(listKeyGenerator.generate(), title, leftToRight);
         listHeaderEntityRepository.save(newList);
         logger.info("Created a new list: '{}' with key '{}'.", title, newList.key);
@@ -73,7 +73,7 @@ public class ListManagementServiceImpl implements ListManagementService {
         Assert.notNull(text, "Text cannot be null.");
         assertLength(text, MIN_TEXT_LENGTH, MAX_TEXT_LENGTH, "Text");
 
-        // Fetch the list. It also makes to to assert the list exists.
+        // Fetch the list. It also makes to assert the list exists.
         ListHeaderEntity list = fetchList(listKey);
 
         int index = listEntryEntityRepository.findMaxListIndex(listKey).orElse(0) + 1;

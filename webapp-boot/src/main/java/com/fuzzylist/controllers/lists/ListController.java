@@ -1,5 +1,6 @@
-package com.fuzzylist.controllers;
+package com.fuzzylist.controllers.lists;
 
+import com.fuzzylist.controllers.BadRequestException;
 import com.fuzzylist.models.ListHeaderEntity;
 import com.fuzzylist.services.ListEntries;
 import com.fuzzylist.services.ListManagementService;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.fuzzylist.controllers.ControllerConstants.API_V1_PREFIX;
-import static com.fuzzylist.controllers.WebResponseFactory.toRecord;
+import static com.fuzzylist.controllers.lists.WebResponseFactory.toRecord;
 
 /**
  * Spring REST controller for accessing lists and list text entries.
@@ -25,6 +26,8 @@ public class ListController {
 
     private final ListManagementService service;
 
+    private static final int MIN_LIST_TITLE_LENGTH = 3;
+
     /**
      * Class constructor.
      */
@@ -36,9 +39,9 @@ public class ListController {
      * @return List of all available lists in the server.
      */
     @GetMapping(value = "/list/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<HeaderResponse> fetchLists() {
+    public List<Models.HeaderResponse> fetchLists() {
         return service.fetchLists()
-                .stream().map(e -> new HeaderResponse(e.key, e.title, e.leftToRight))
+                .stream().map(e -> new Models.HeaderResponse(e.key, e.title, e.leftToRight))
                 .collect(Collectors.toList());
     }
 
@@ -52,15 +55,15 @@ public class ListController {
      * @return Response containing list of texts.
      */
     @GetMapping(value = "/list/{listKey}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ListDataResponse fetchListText(@PathVariable("listKey") String listKey,
-                                          @RequestParam(name = "startAfter", required = false) Integer startIndex,
-                                          @RequestParam(name = "limit", required = false) Integer limit,
-                                          @RequestParam(name = "order", required = false, defaultValue = "ASC") String order) {
+    public Models.ListDataResponse fetchListText(@PathVariable("listKey") String listKey,
+                                                 @RequestParam(name = "startAfter", required = false) Integer startIndex,
+                                                 @RequestParam(name = "limit", required = false) Integer limit,
+                                                 @RequestParam(name = "order", required = false, defaultValue = "ASC") String order) {
         // Fetch list entries.
         boolean ascending = parseOrder(order);
         ListEntries entries = service.fetchListTexts(listKey, startIndex, limit, ascending);
 
-        return new ListDataResponse(toRecord(entries.listHeaderEntity()), toRecord(entries.entries()));
+        return new Models.ListDataResponse(toRecord(entries.listHeaderEntity()), toRecord(entries.entries()));
     }
 
     /**
@@ -70,7 +73,7 @@ public class ListController {
      * @return List response containing only list key.
      */
     @PostMapping(value = "/list/")
-    public HeaderResponse createList(@RequestBody CreateListRequest request) throws BadRequestException {
+    public Models.HeaderResponse createList(@RequestBody Models.CreateListRequest request) throws BadRequestException {
         String title = request.title();
         boolean leftToRight = request.leftToRight() != null ? request.leftToRight() : true;
 
@@ -78,9 +81,13 @@ public class ListController {
             throw new BadRequestException("Missing 'title' property.");
         }
 
-        ListHeaderEntity listHeaderEntity = service.createList(title, leftToRight);
+        title = title.trim();
+        if (title.length() < MIN_LIST_TITLE_LENGTH) {
+            throw new BadRequestException("Title must be at least " + MIN_LIST_TITLE_LENGTH + " characters long.");
+        }
 
-        return new HeaderResponse(listHeaderEntity.key, null, null);
+        ListHeaderEntity e = service.createList(title, leftToRight);
+        return new Models.HeaderResponse(e.key, e.title, e.leftToRight);
     }
 
     /**
@@ -90,7 +97,7 @@ public class ListController {
      * @param request Request containing the text.
      */
     @PostMapping(value = "/list/{listKey}/")
-    public void addListText(@PathVariable("listKey") String listKey, @RequestBody AddTextRequest request) {
+    public void addListText(@PathVariable("listKey") String listKey, @RequestBody Models.AddTextRequest request) {
         service.addListText(listKey, request.text());
     }
 
