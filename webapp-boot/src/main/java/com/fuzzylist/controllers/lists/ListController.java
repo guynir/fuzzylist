@@ -26,8 +26,6 @@ public class ListController {
 
     private final ListManagementService service;
 
-    private static final int MIN_LIST_TITLE_LENGTH = 3;
-
     /**
      * Class constructor.
      */
@@ -79,11 +77,6 @@ public class ListController {
 
         if (!StringUtils.hasText(title)) {
             throw new BadRequestException("Missing 'title' property.");
-        }
-
-        title = title.trim();
-        if (title.length() < MIN_LIST_TITLE_LENGTH) {
-            throw new BadRequestException("Title must be at least " + MIN_LIST_TITLE_LENGTH + " characters long.");
         }
 
         ListHeaderEntity e = service.createList(title, leftToRight);

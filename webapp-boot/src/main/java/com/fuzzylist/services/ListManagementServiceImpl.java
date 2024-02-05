@@ -5,6 +5,7 @@ import com.fuzzylist.models.ListHeaderEntity;
 import com.fuzzylist.models.ListEntryEntity;
 import com.fuzzylist.repositories.ListHeaderEntityRepository;
 import com.fuzzylist.repositories.ListEntryEntityRepository;
+import com.fuzzylist.validation.StringConstraintValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,7 +58,12 @@ public class ListManagementServiceImpl implements ListManagementService {
     public ListHeaderEntity createList(String title, boolean leftToRight) throws IllegalArgumentException {
         Assert.notNull(title, "Title cannot be null.");
 
-        assertLength(title, MIN_TITLE_LENGTH, MAX_TITLE_LENGTH, "Title");
+        StringConstraintValidator
+                .newValidator(title)
+                .notEmpty("Title cannot be empty string.")
+                .minLength(MIN_TITLE_LENGTH, "Title must be at least {minLength} characters long.")
+                .maxLength(MAX_TEXT_LENGTH, "Title can be up to {maxLength} characters long.");
+
         ListHeaderEntity newList = new ListHeaderEntity(listKeyGenerator.generate(), title, leftToRight);
         listHeaderEntityRepository.save(newList);
         logger.info("Created a new list: '{}' with key '{}'.", title, newList.key);
@@ -71,7 +77,12 @@ public class ListManagementServiceImpl implements ListManagementService {
             throws IllegalArgumentException, UnknownListException {
         // No need to test 'listKey' for null. It is done by 'fetchList'.
         Assert.notNull(text, "Text cannot be null.");
-        assertLength(text, MIN_TEXT_LENGTH, MAX_TEXT_LENGTH, "Text");
+
+        StringConstraintValidator
+                .newValidator(text)
+                .notEmpty("Title cannot be empty string.")
+                .minLength(MIN_TEXT_LENGTH, "Text must be at least {minLength} characters long.")
+                .maxLength(MAX_TEXT_LENGTH, "Text can be up to {maxLength} characters long.");
 
         // Fetch the list. It also makes to assert the list exists.
         ListHeaderEntity list = fetchList(listKey);
@@ -90,9 +101,13 @@ public class ListManagementServiceImpl implements ListManagementService {
     public ListEntries fetchListTexts(String listKey,
                                       Integer startAfterIndex,
                                       Integer numberOfTexts,
-                                      boolean orderIndexAscending) throws IllegalArgumentException {
+                                      boolean orderIndexAscending)
+            throws IllegalArgumentException, UnknownListException {
+
         // Fetch list just to make sure it exists.
+        // If list does not exist, fetchList will throw exception.
         ListHeaderEntity listHeaderEntity = fetchList(listKey);
+
         if (numberOfTexts == null) {
             numberOfTexts = ListManagementService.PAGE_SIZE;
         }
@@ -118,27 +133,5 @@ public class ListManagementServiceImpl implements ListManagementService {
         Assert.notNull(listKey, "List key cannot be null.");
         return listHeaderEntityRepository.findByKey(listKey)
                 .orElseThrow(() -> new UnknownListException("Unknown list: " + listKey));
-    }
-
-    /**
-     * Assert that a length of a given string is within a given range. If assertion fails,
-     * {@code IllegalArgumentException} if thrown.
-     *
-     * @param st         String length to assert.
-     * @param minLength  Minimum string length, inclusive.
-     * @param maxLength  Maximum string length, inclusive.
-     * @param stringName Name of string, required for error message.
-     * @throws IllegalArgumentException If <i>st</i> is out of range.
-     */
-    private void assertLength(String st, int minLength, int maxLength, String stringName) throws IllegalArgumentException {
-        int length = st.length();
-        if (length < minLength || length > maxLength) {
-            throw new IllegalArgumentException(
-                    String.format("%s length is out of bounds (must be in a range of %d and %d; actual length: %d).",
-                            stringName,
-                            minLength,
-                            maxLength,
-                            length));
-        }
     }
 }
