@@ -1,6 +1,7 @@
 package com.fuzzylist.controllers;
 
 import com.fuzzylist.services.UnknownListException;
+import com.fuzzylist.validation.PropertyConstraintsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,21 @@ public class RestExceptionHandler {
     }
 
     /**
+     * Generate proper web response for {@link PropertyConstraintsException} that includes HTTP status 400 with body
+     * containing error message.
+     *
+     * @param ex Exception instance.
+     * @return Error response with message.
+     */
+    @ExceptionHandler(PropertyConstraintsException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlePropertyContraintException(PropertyConstraintsException ex) {
+        logger.warn("Handling a bad request exception with message: " + ex.getMessage());
+        return new ErrorResponse(ex.getMessage());
+    }
+
+    /**
      * Generate proper web response for {@link UnknownListException} that includes HTTP status 404 (not found)
      * with body containing error message.
      *
@@ -62,6 +78,7 @@ public class RestExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleGlobalException() {
+    public void handleGlobalException(Exception ex) {
+        logger.error("Unexpected error.", ex);
     }
 }

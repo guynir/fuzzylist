@@ -61,8 +61,8 @@ public class ListManagementServiceImpl implements ListManagementService {
         StringConstraintValidator
                 .newValidator(title)
                 .notEmpty("Title cannot be empty string.")
-                .minLength(MIN_TITLE_LENGTH, "Title must be at least {minLength} characters long.")
-                .maxLength(MAX_TEXT_LENGTH, "Title can be up to {maxLength} characters long.");
+                .minLength(MIN_TITLE_LENGTH, "Title must be at least ${minLength} characters long.")
+                .maxLength(MAX_TEXT_LENGTH, "Title can be up to ${maxLength} characters long.");
 
         ListHeaderEntity newList = new ListHeaderEntity(listKeyGenerator.generate(), title, leftToRight);
         listHeaderEntityRepository.save(newList);
@@ -80,9 +80,9 @@ public class ListManagementServiceImpl implements ListManagementService {
 
         StringConstraintValidator
                 .newValidator(text)
-                .notEmpty("Title cannot be empty string.")
-                .minLength(MIN_TEXT_LENGTH, "Text must be at least {minLength} characters long.")
-                .maxLength(MAX_TEXT_LENGTH, "Text can be up to {maxLength} characters long.");
+                .notEmpty("Text cannot be empty string.")
+                .minLength(MIN_TEXT_LENGTH, "Text must be at least ${minLength} characters long.")
+                .maxLength(MAX_TEXT_LENGTH, "Text can be up to ${maxLength} characters long.");
 
         // Fetch the list. It also makes to assert the list exists.
         ListHeaderEntity list = fetchList(listKey);
