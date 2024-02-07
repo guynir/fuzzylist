@@ -2,9 +2,12 @@
 
 import React, {KeyboardEventHandler, useEffect, useRef, useState} from "react";
 import {addListItem, EntryResponse, getList, GetListResponse} from "@/services/lists";
-import {AxiosResponse} from "axios";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
+import "primeicons/primeicons.css";
+import {TypeHandler} from "@/services/typehandler";
+import {BadRequestException, NotFoundException} from "@/services/client";
+import {hasText} from "@/services/helpers";
 
 export default function ListPage({params}: { params: { key: string } }) {
     const listKey: string = params.key;
@@ -12,16 +15,21 @@ export default function ListPage({params}: { params: { key: string } }) {
     const [loadMessage, setLoadMessage] = useState<string | null>("Loading ...");
     const [title, setTitle] = useState("")
     const [entries, setEntries] = useState<EntryResponse[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     const fetchList = (): void => {
         getList(listKey, 25, false)
-            .then((response: AxiosResponse<GetListResponse, any>) => {
-                setTitle(response.data.meta.title);
-                setEntries(response.data.entries);
+            .then((response: GetListResponse) => {
+                setTitle(response.meta.title);
+                setEntries(response.entries);
                 setLoadMessage(null);
             })
             .catch(error => {
-                alert(error);
+                TypeHandler.handle(error)
+                    .on(NotFoundException, () => setLoadMessage("List does not exist."))
+                    .else(() => {
+                        throw error
+                    });
             })
     }
 
@@ -35,15 +43,26 @@ export default function ListPage({params}: { params: { key: string } }) {
 
     const handleClick = (): void => {
         if (!inputRef.current) {
-            return
+            return;
         }
 
-        addListItem(listKey, inputRef.current.value)
+        let text: string | null | undefined = inputRef.current.value;
+
+        // If user did not provide any text -- ignore request to add text item. Just exit.
+        if (!hasText(text)) {
+            inputRef.current.focus();
+            return;
+        }
+
+        addListItem(listKey, text)
             .then(() => {
+                setErrorMessage("");
                 fetchList();
             })
-            .catch(() => {
-                alert("ERROR!");
+            .catch(error => {
+                TypeHandler.handle(error)
+                    .on(BadRequestException, (ex: BadRequestException) => setErrorMessage(ex.message))
+                    .else(() => setErrorMessage("Unexpected error."))
             })
 
         inputRef.current.value = "";
@@ -60,24 +79,33 @@ export default function ListPage({params}: { params: { key: string } }) {
         <main className="flex flex-col min-h-screen items-center justify-between p-24">
             <div className="w-full items-center max-w-2xl default-font">
                 {loadMessage == null ?
-                    <div>
-                        <h1 className="flex flex-col content-left text-left w-full py-4 font-secondary-header">
-                            {title}
-                        </h1>
-                        <div>
-                            <InputText id="listName" type="text"
-                                       className="border-solid border-1 h-8 p-0 border-gray-200 rounded-sm"
-                                       onKeyDown={handleKey}
-                                       ref={inputRef}/>
-                            <Button className="mx-3 h-8 border-2 border-gray-200" label="Add" onClick={handleClick}
-                                    ref={buttonRef}/>
+                    <div className="flex flex-row">
+                        <div className="py-3 px-3">
+                            <div className="pi pi-arrow-circle-left" onClick={() => document.location.href = "/"}></div>
+                        </div>
+                        <div className="w-full">
+                            <div className="flex flex-col content-left text-left w-full py-0 font-secondary-header">
+                                {title}
+                            </div>
+                            <div className="w-full">
+                                <InputText id="listName" type="text"
+                                           className="border-solid border-1 h-8 p-0 border-gray-200 rounded-sm w-96"
+                                           onKeyDown={handleKey}
+                                           ref={inputRef}/>
+                                <Button className="mx-3 h-8 border-2 border-gray-200" label="Add" onClick={handleClick}
+                                        ref={buttonRef}/>
 
-                            {entries.map((v: EntryResponse) => {
-                                return <div key={"text-" + v.id}>
-                                    <span className="pr-3">{v.index}.</span>
-                                    <span>{v.text}</span>
+                                <div className="py-2 mb-4 text-sm text-red-600 rounded-lg" role="alert">
+                                    <div className="text-lg h-5">{errorMessage}</div>
                                 </div>
-                            })}
+
+                                {entries.map((v: EntryResponse) => {
+                                    return <div key={"text-" + v.id}>
+                                        <span className="pr-3">{v.index}.</span>
+                                        <span>{v.text}</span>
+                                    </div>
+                                })}
+                            </div>
                         </div>
                     </div>
                     : <span>{loadMessage}</span>
