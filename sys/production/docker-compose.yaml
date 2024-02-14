@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  database:
+    image: library/postgres:16.1
+    env_file:
+      - .env
+    ports:
+      - "5432:${DATABASE_PORT:-5432}"
+    volumes:
+      - /data/db:/var/lib/postgresql/data
+
+  http-router:
+    image: 10.100.102.75:32000/http-router:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - webapp-boot
+      - webapp-ui
+
+  webapp-boot:
+    image: 10.100.102.75:32000/webapp-boot:latest
+    env_file:
+      - .env
+    depends_on:
+      - flyway-migrate
+
+  webapp-ui:
+    image: 10.100.102.75:32000/webapp-ui:latest
+    depends_on:
+      - flyway-migrate
+
+  flyway-migrate:
+    image: 10.100.102.75:32000/flyway-migration:latest
+    depends_on:
+      - database
+    command: -url=jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT:-5432}/${DATABASE_NAME} -schemas=public -user=${DATABASE_USERNAME} -password=${DATABASE_PASSWORD} -connectRetries=60 migrate
