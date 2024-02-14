@@ -37,6 +37,32 @@ pipeline {
                         }
                     }
                 }
+
+                stage('Build HTTP router') {
+                    steps {
+                        dir ("sys/production/http-router") {
+                        script {
+                            def image = docker.build("http-router:latest")
+                                docker.withRegistry(env.DOCKER_REPOSITORY) {
+                                    image.push()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Build FlywayDB migration image') {
+                    steps {
+                        dir ("sys/db/migrations") {
+                            script {
+                                def image = docker.build("flyway-migration:latest")
+                                docker.withRegistry(env.DOCKER_REPOSITORY) {
+                                    image.push()
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
