@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    stages {
+        stage("Stop all services") {
+            steps {
+                script {
+                    sh "docker-compose -f sys/production/docker-compose.yaml --env-file /data/conf/prod.env -p fuzzylist_prod down"
+                }
+            }
+        }
+
+        stage("Pull latest images") {
+            steps {
+                script {
+                    sh "docker-compose -f sys/production/docker-compose.yaml --env-file /data/conf/prod.env pull"
+                }
+            }
+        }
+
+        stage("Start services") {
+            steps {
+                script {
+                    sh "docker-compose -f sys/production/docker-compose.yaml --env-file /data/conf/prod.env -p fuzzylist_prod up -d"
+                }
+            }
+        }
+    }
+}
+
+
+
+
+

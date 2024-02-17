@@ -2,12 +2,21 @@ version: "3.8"
 services:
   database:
     image: library/postgres:16.1
-    env_file:
-      - .env
     ports:
       - "5432:${DATABASE_PORT:-5432}"
     volumes:
       - /data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_PORT=${DATABASE_PORT:-5432}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
 
   http-router:
     image: 10.100.102.75:32000/http-router:latest
@@ -16,21 +25,36 @@ services:
     depends_on:
       - webapp-boot
       - webapp-ui
+    restart: always
 
   webapp-boot:
     image: 10.100.102.75:32000/webapp-boot:latest
-    env_file:
-      - .env
     depends_on:
-      - flyway-migrate
+      flyway-migrate:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+    restart: always
 
   webapp-ui:
     image: 10.100.102.75:32000/webapp-ui:latest
     depends_on:
-      - flyway-migrate
+      - webapp-boot
+    restart: always
 
   flyway-migrate:
     image: 10.100.102.75:32000/flyway-migration:latest
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     command: -url=jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT:-5432}/${DATABASE_NAME} -schemas=public -user=${DATABASE_USERNAME} -password=${DATABASE_PASSWORD} -connectRetries=60 migrate
+    environment:
+      - DATABASE_HOST={$DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
