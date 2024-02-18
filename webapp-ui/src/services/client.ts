@@ -34,6 +34,9 @@ export class NotFoundException {
 export class InternalServerError {
 }
 
+export class ServiceUnavailable {
+}
+
 export async function handleExecution<T>(promise: Promise<AxiosResponse<T, any>>): Promise<T> {
     try {
         let response: AxiosResponse<T, any> = await promise;
@@ -48,7 +51,7 @@ export function handleOKResponse<T>(response: AxiosResponse<T, any>) {
     return Promise.resolve<T>(response.data);
 }
 
-export function handleError<T>(error: unknown) {
+export function handleError(error: unknown) {
     // If this error is of type "AxiosError", we can extract an error message and return solid type-safe
     // response.
     if (error instanceof AxiosError && error.response) {
@@ -62,9 +65,14 @@ export function handleError<T>(error: unknown) {
             case HttpStatusCode.NotFound:
                 throw new NotFoundException();
 
+            case HttpStatusCode.BadGateway:
+                throw new ServiceUnavailable();
+
             case HttpStatusCode.InternalServerError:
                 throw new InternalServerError();
 
+            case HttpStatusCode.GatewayTimeout:
+                throw new ServiceUnavailable();
         }
     }
 

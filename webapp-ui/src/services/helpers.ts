@@ -16,3 +16,10 @@ export function isDefined(obj: any): boolean {
 export function hasText(st: string | null | undefined): boolean {
     return isDefined(st) && st!.trim().length > 0;
 }
+
+export function capitalize(st: string): string {
+    if (hasText(st)) {
+        st = st[0].toUpperCase() + st.substring(1);
+    }
+    return st;
+}

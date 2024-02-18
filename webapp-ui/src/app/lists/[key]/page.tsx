@@ -1,6 +1,6 @@
 'use client';
 
-import React, {KeyboardEventHandler, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {addListItem, EntryResponse, getList, GetListResponse} from "@/services/lists";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
@@ -8,16 +8,30 @@ import "primeicons/primeicons.css";
 import {TypeHandler} from "@/services/typehandler";
 import {BadRequestException, NotFoundException} from "@/services/client";
 import {hasText} from "@/services/helpers";
+import {createToast, Toaster} from "@/components/Toaster";
+import {handleGeneralErrors} from "@/app/ErrorHandler";
 
+/**
+ *
+ */
 export default function ListPage({params}: { params: { key: string } }) {
+    // The key of the current list.
     const listKey: string = params.key;
 
+    // Load message. Displayed during fetch of list details from server.
     const [loadMessage, setLoadMessage] = useState<string | null>("Loading ...");
     const [title, setTitle] = useState("")
     const [entries, setEntries] = useState<EntryResponse[]>([]);
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-    const fetchList = (): void => {
+    //
+    // Reference.
+    //
+    const inputRef: React.RefObject<HTMLInputElement> = useRef<HTMLInputElement>(null);
+    const buttonRef: React.RefObject<Button> = useRef<Button>(null);
+    const toaster: Toaster = createToast();
+
+    function fetchList(): void {
         getList(listKey, 25, false)
             .then((response: GetListResponse) => {
                 setTitle(response.meta.title);
@@ -38,10 +52,10 @@ export default function ListPage({params}: { params: { key: string } }) {
         fetchList();
     }, []);
 
-    const inputRef = useRef<HTMLInputElement>(null);
-    const buttonRef = useRef<Button>(null);
-
-    const handleClick = (): void => {
+    /**
+     * Handles 'Add' operation of new text entry.
+     */
+    function handleClick() {
         if (!inputRef.current) {
             return;
         }
@@ -62,14 +76,19 @@ export default function ListPage({params}: { params: { key: string } }) {
             .catch(error => {
                 TypeHandler.handle(error)
                     .on(BadRequestException, (ex: BadRequestException) => setErrorMessage(ex.message))
-                    .else(() => setErrorMessage("Unexpected error."))
+                    .else(() => handleGeneralErrors(error, toaster));
             })
 
         inputRef.current.value = "";
         inputRef.current.focus();
     }
 
-    const handleKey: KeyboardEventHandler = (source: React.KeyboardEvent) => {
+    /**
+     * Traps 'Enter' key can emulate user click on the 'Add' button.
+     *
+     * @param source Keyboard event data.
+     */
+    function handleKey(source: React.KeyboardEvent) {
         if (source.key == "Enter") {
             handleClick();
         }
@@ -111,6 +130,7 @@ export default function ListPage({params}: { params: { key: string } }) {
                     : <span>{loadMessage}</span>
                 }
             </div>
+            {toaster.element()}
         </main>
     )
 }

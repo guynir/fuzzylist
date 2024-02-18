@@ -78,7 +78,7 @@ export class TypeHandler {
      * @param callable Callable to invoke if none of the previous were called.
      */
     public else<T extends object>(callable: (value: any) => void): TypeHandler {
-        if (this.consumed && !this.consumed) {
+        if (!this.consumed) {
             callable(this.obj);
         }
         return this;

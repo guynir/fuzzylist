@@ -10,6 +10,8 @@ services:
       - "5432:${POSTGRES_PORT}"
     env_file:
       - .env
+    volumes:
+      - /var/lib/postgresql
 
   http-router:
     build:
