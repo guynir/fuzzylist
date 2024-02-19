@@ -9,15 +9,25 @@ import {TypeHandler} from "@/services/typehandler";
 import {hasText} from "@/services/helpers";
 import {createToast, Toaster} from "@/components/Toaster";
 import {handleGeneralErrors} from "@/app/ErrorHandler";
+import {Checkbox} from "primereact/checkbox";
+
+/**
+ * State of current message displayed to the user. Can be either an informative message, such as 'Creating list ...'
+ * or validation error message (such as 'List name too short').
+ */
+interface Message {
+    message: string,
+    error: boolean
+}
 
 export default function Home() {
     //
     // Component states.
     //
-    const [listName, setListName] = useState("")
-    const [validationError, setValidationError] = useState<string | null>("")
-    const [progressMessage, setProgressMessage] = useState("")
-    const [buttonDisabled, setButtonDisabled] = useState(false)
+    const [listName, setListName] = useState("");
+    const [rtl, setRtl] = useState(false);
+    const [message, setMessage] = useState<Message | null>(null);
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
     const toaster: Toaster = createToast();
 
@@ -33,26 +43,24 @@ export default function Home() {
         setListName(name)
 
         if (!hasText(name)) {
-            setValidationError("Missing list name.")
+            setMessage({message: "Missing list name.", error: true})
         } else {
-            setValidationError("")
-            setProgressMessage("Creating new list ...")
+            setMessage({message: "Creating list ...", error: false})
             setButtonDisabled(true);
 
             // Try to create the list.
-            createList(name)
+            createList(name, !rtl)
                 .then(response => {
                     document.location.href = "/lists/" + response.key;
                 })
                 .catch((error) => {
                     // Clear current validation or progress message. Enable 'Create' button.
-                    setValidationError(null);
-                    setProgressMessage("");
+                    setMessage(null);
                     setButtonDisabled(false);
 
                     TypeHandler.handle(error)
                         .on(BadRequestException, (badRequest: BadRequestException) => {
-                            setValidationError(badRequest.message);
+                            setMessage({message: badRequest.message!, error: true});
                         })
                         .else(() => handleGeneralErrors(error, toaster));
                 })
@@ -65,24 +73,26 @@ export default function Home() {
      */
     function handleInputChange(event: ChangeEvent<HTMLInputElement>): boolean {
         setListName(event.target.value)
-        setValidationError("")
+        setMessage(null);
         return true;
     }
 
     //
     // Generate message element based on type of available message (if any).
     //
-    let messageEl: ReactElement;
-    if (hasText(validationError)) {
-        messageEl = <div className="py-2 mb-4 text-sm text-red-600 rounded-lg" role="alert">
-            <span className="text-lg">{validationError}</span>
-        </div>
-    } else if (progressMessage.length > 0) {
-        messageEl = <div className="py-2 mb-4 text-sm text-green-600 rounded-lg">
-            <span className="text-lg">{progressMessage}</span>
-        </div>
+    let messageEl: ReactElement | undefined;
+    if (message != null) {
+        if (message.error) {
+            messageEl = <div className="py-2 mb-4 text-sm text-red-600 rounded-lg" role="alert">
+                <span className="text-lg">{message.message}</span>
+            </div>
+        } else {
+            messageEl = <div className="py-2 mb-4 text-sm text-green-600 rounded-lg">
+                <span className="text-lg">{message.message}</span>
+            </div>
+        }
     } else {
-        messageEl = <span></span>
+        messageEl = undefined
     }
 
     return (
@@ -110,7 +120,14 @@ export default function Home() {
                                 onClick={() => handleSubmitRequest()}
                                 disabled={buttonDisabled}
                             />
-
+                        </div>
+                        <div className="my-2">
+                            <Checkbox inputId="rightToLeft"
+                                      className="my-1"
+                                      checked={rtl}
+                                      onChange={(event) => setRtl(event.target.checked!)}
+                            />
+                            <label htmlFor="rightToLeft" className="ml-2">Right-to-left list</label>
                         </div>
 
                         {messageEl}

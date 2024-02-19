@@ -22,6 +22,7 @@ export default function ListPage({params}: { params: { key: string } }) {
     const [loadMessage, setLoadMessage] = useState<string | null>("Loading ...");
     const [title, setTitle] = useState("")
     const [entries, setEntries] = useState<EntryResponse[]>([]);
+    const [leftToRight, setLeftToRight] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     //
@@ -35,6 +36,7 @@ export default function ListPage({params}: { params: { key: string } }) {
         getList(listKey, 25, false)
             .then((response: GetListResponse) => {
                 setTitle(response.meta.title);
+                setLeftToRight(response.meta.leftToRight);
                 setEntries(response.entries);
                 setLoadMessage(null);
             })
@@ -102,8 +104,8 @@ export default function ListPage({params}: { params: { key: string } }) {
                         <div className="py-3 px-3">
                             <div className="pi pi-arrow-circle-left" onClick={() => document.location.href = "/"}></div>
                         </div>
-                        <div className="w-full">
-                            <div className="flex flex-col content-left text-left w-full py-0 font-secondary-header">
+                        <div className="w-full" dir={leftToRight ? "ltr" : "rtl"}>
+                            <div className="flex flex-col w-full py-0 font-secondary-header">
                                 {title}
                             </div>
                             <div className="w-full">

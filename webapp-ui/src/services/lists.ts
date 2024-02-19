@@ -39,12 +39,13 @@ export interface GetListResponse {
 /**
  * Create a new list.
  * @param name List name.
+ * @param leftToRight Indicates if the list is left-to-right (true) or right-to-left (false).
  * @throws BadRequestException If 'name' does not meet minimum requirements.
  */
-export async function createList(name: string): Promise<CreateListResponse> {
+export async function createList(name: string, leftToRight: boolean): Promise<CreateListResponse> {
     return handleExecution<CreateListResponse>(axios.post(makeURL(), {
         "title": name,
-        "leftToRight": true
+        "leftToRight": leftToRight
     }));
 }
 
