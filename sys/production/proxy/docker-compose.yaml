@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  proxy:
+    image: registry.digitalocean.com/fuzzylist-proxy/proxy:latest
+    volumes:
+      - /opt/ssl:/etc/nginx/ssl
+    restart: always
+    network_mode: host

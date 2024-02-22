@@ -1,0 +1,56 @@
+#######################################################################
+#
+# Handles fuzzylist.com and www.fuzzylist.com domains.
+#
+#######################################################################
+
+# Virtual server that redirects all HTTP requests to HTTPS.
+server {
+    listen              80;
+    server_name         fuzzylist.com www.fuzzylist.com;
+
+    return 302 https://www.fuzzylist.com$request_uri;
+}
+
+# Virtual server that redirects https://fuzzylist.com to https://www.fuzzylist.com
+server {
+    listen              443 ssl;
+    server_name         fuzzylist.com;
+
+    ##
+    # SSL configuration
+    ##
+    ssl_certificate     /etc/nginx/ssl/ssl.crt;
+    ssl_certificate_key /etc/nginx/ssl/ssl.key;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    return 302 https://www.fuzzylist.com$request_uri;
+}
+
+# Virtual server at https://www.fuzzylist.com that acts as a reverse proxy to our applicaton.
+server {
+    listen              443 ssl;
+    server_name         www.fuzzylist.com;
+
+    ##
+    # SSL configuration
+    ##
+    ssl_certificate     /etc/nginx/ssl/ssl.crt;
+    ssl_certificate_key /etc/nginx/ssl/ssl.key;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    location / {
+        # Setup as a reverse proxy.
+        proxy_set_header    Host $host;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_pass          http://localhost:8080;
+        proxy_buffers       16 4k;
+        proxy_buffer_size   2k;
+
+        # Limit browser requests to the www.fuzzylist.com;
+        # Don't let any 3rd party to address external sites.
+        add_header          X-Frame-Options "SAMEORIGIN";
+    }
+}
