@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class WebResponseFactory {
 
     public static Models.HeaderResponse toRecord(ListHeaderEntity entity) {
-        return new Models.HeaderResponse(entity.key, entity.title, entity.leftToRight);
+        return new Models.HeaderResponse(entity.key, entity.title, entity.leftToRight, entity.createdAt, entity.updatedAt);
     }
 
     public static Models.EntryResponse toRecord(ListEntryEntity entity) {

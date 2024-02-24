@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useEffect, useRef, useState} from "react";
-import {addListItem, EntryResponse, getList, GetListResponse} from "@/services/lists";
+import {addListItem, EntryResponse, getList, GetListResponse, ListMetaData} from "@/services/lists";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
 import "primeicons/primeicons.css";
@@ -10,6 +10,7 @@ import {BadRequestException, NotFoundException} from "@/services/client";
 import {hasText} from "@/services/helpers";
 import {createToast, Toaster} from "@/components/Toaster";
 import {handleGeneralErrors} from "@/app/ErrorHandler";
+import {toHumanReadable} from "@/services/timeutils";
 
 /**
  *
@@ -20,7 +21,7 @@ export default function ListPage({params}: { params: { key: string } }) {
 
     // Load message. Displayed during fetch of list details from server.
     const [loadMessage, setLoadMessage] = useState<string | null>("Loading ...");
-    const [title, setTitle] = useState("")
+    const [header, setHeader] = useState<ListMetaData>();
     const [entries, setEntries] = useState<EntryResponse[]>([]);
     const [leftToRight, setLeftToRight] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -35,7 +36,7 @@ export default function ListPage({params}: { params: { key: string } }) {
     function fetchList(): void {
         getList(listKey, 25, false)
             .then((response: GetListResponse) => {
-                setTitle(response.meta.title);
+                setHeader(response.meta);
                 setLeftToRight(response.meta.leftToRight);
                 setEntries(response.entries);
                 setLoadMessage(null);
@@ -96,25 +97,56 @@ export default function ListPage({params}: { params: { key: string } }) {
         }
     }
 
+    let listAgeMessage: string | undefined = undefined;
+    if (header) {
+        const createdAt: number = Date.parse(header.createdAt);
+        const updateAt: number = Date.parse(header.updatedAt);
+        const timeZoneOffsetMillis: number = new Date().getTimezoneOffset() * 60 * 1000;
+        const now: number = Date.now() + timeZoneOffsetMillis;
+
+        const createdMessage: string = toHumanReadable(now - createdAt);
+        const updatedMessage: string = toHumanReadable(now - updateAt)
+
+        if (createdMessage === updatedMessage) {
+            listAgeMessage = `Created ${createdMessage} ago.`
+        } else {
+            listAgeMessage = `Created ${createdMessage} ago, updated ${updatedMessage} ago.`
+        }
+    }
+
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-24">
             <div className="w-full items-center max-w-2xl default-font">
                 {loadMessage == null ?
                     <div className="flex flex-row">
                         <div className="py-3 px-3">
-                            <div className="pi pi-arrow-circle-left" onClick={() => document.location.href = "/"}></div>
+                            <div className="pi pi-arrow-circle-left"
+                                 onClick={() => document.location.href = "/"}
+                                 title="Back to home page">
+                            </div>
                         </div>
                         <div className="w-full" dir={leftToRight ? "ltr" : "rtl"}>
                             <div className="flex flex-col w-full py-0 font-secondary-header">
-                                {title}
+                                {header?.title}
                             </div>
                             <div className="w-full">
-                                <InputText id="listName" type="text"
-                                           className="border-solid border-1 h-8 p-0 border-gray-200 rounded-sm w-96"
-                                           onKeyDown={handleKey}
-                                           ref={inputRef}/>
-                                <Button className="mx-3 h-8 border-2 border-gray-200" label="Add" onClick={handleClick}
-                                        ref={buttonRef}/>
+                                <div className="flex flex-row">
+                                    <div className="flex flex-col">
+                                        <InputText id="listName" type="text"
+                                                   className="border-solid border-1 h-8 p-0 border-gray-200 rounded-sm w-96"
+                                                   onKeyDown={handleKey}
+                                                   ref={inputRef}/>
+
+                                        <div className="text-sm text-gray-500 text-justify" dir="ltr">
+                                            {listAgeMessage}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Button className="mx-3 h-8 border-2 border-gray-200" label="Add"
+                                                onClick={handleClick}
+                                                ref={buttonRef}/>
+                                    </div>
+                                </div>
 
                                 <div className="py-2 mb-4 text-sm text-red-600 rounded-lg" role="alert">
                                     <div className="text-lg h-5">{errorMessage}</div>

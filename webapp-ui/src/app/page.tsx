@@ -12,7 +12,8 @@ import {handleGeneralErrors} from "@/app/ErrorHandler";
 import {Checkbox} from "primereact/checkbox";
 
 /**
- * State of current message displayed to the user. Can be either an informative message, such as 'Creating list ...'
+ * State of the current message displayed to the user.
+ * Can be either an informative message, such as 'Creating list ...'
  * or validation error message (such as 'List name too short').
  */
 interface Message {
@@ -35,7 +36,7 @@ export default function Home() {
      * Handles user clicking on 'Create' button.
      *
      * Perform validations and sets error messages as appropriate.
-     * If list name is valid, creates a new list by addressing server side.
+     * If the list name is valid, create a new list by addressing the server side.
      */
     function handleSubmitRequest(): void {
         // Trim list name. We don't like spaces.
@@ -78,7 +79,7 @@ export default function Home() {
     }
 
     //
-    // Generate message element based on type of available message (if any).
+    // Generate a message element based on a type of available message (if any).
     //
     let messageEl: ReactElement | undefined;
     if (message != null) {
@@ -113,6 +114,8 @@ export default function Home() {
                                        value={listName}
                                        className="border-solid border-2 h-12 px-4 border-gray-200"
                                        onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(e)}
+                                       maxLength={255}
+                                       size={40}
                             />
                             <Button
                                 label="Create"

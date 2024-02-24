@@ -5,6 +5,8 @@ import com.fuzzylist.common.ObjectBag;
 import com.fuzzylist.common.ObjectBagAware;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "list_header")
 public class ListHeaderEntity extends ObjectBagAware {
@@ -35,6 +37,20 @@ public class ListHeaderEntity extends ObjectBagAware {
     public boolean leftToRight = true;
 
     /**
+     * Date and time of when list was created.
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    public LocalDateTime createdAt;
+
+    /**
+     * Date and time of when list last updated.
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    public LocalDateTime updatedAt;
+
+    /**
      * Class constructor.
      */
     public ListHeaderEntity() {
@@ -43,18 +59,20 @@ public class ListHeaderEntity extends ObjectBagAware {
     /**
      * Class constructor.
      *
-     * @param key         List key.
-     * @param title       Title.
-     * @param leftToRight Indicator of LTR or RTL.
+     * @param key          List key.
+     * @param title        Title.
+     * @param leftToRight  Indicator of LTR or RTL.
+     * @param creationTime Date and time when list was created.
      */
-    public ListHeaderEntity(String key, String title, boolean leftToRight) {
+    public ListHeaderEntity(String key, String title, boolean leftToRight, LocalDateTime creationTime) {
         this.key = key;
         this.title = title;
         this.leftToRight = leftToRight;
+        this.createdAt = this.updatedAt = creationTime;
     }
 
     @Override
     protected ObjectBag state() {
-        return new ObjectBag(id, key, title, leftToRight);
+        return new ObjectBag(id, key, title, leftToRight, createdAt, updatedAt);
     }
 }

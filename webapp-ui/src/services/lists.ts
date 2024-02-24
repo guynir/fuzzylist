@@ -17,6 +17,8 @@ export interface ListMetaData {
     key: string,
     title: string,
     leftToRight: boolean
+    createdAt: string,
+    updatedAt: string
 }
 
 /**

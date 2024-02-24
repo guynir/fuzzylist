@@ -39,7 +39,7 @@ public class ListController {
     @GetMapping(value = "/list/", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Models.HeaderResponse> fetchLists() {
         return service.fetchLists()
-                .stream().map(e -> new Models.HeaderResponse(e.key, e.title, e.leftToRight))
+                .stream().map(e -> new Models.HeaderResponse(e.key, e.title, e.leftToRight, e.createdAt, e.updatedAt))
                 .collect(Collectors.toList());
     }
 
@@ -80,7 +80,7 @@ public class ListController {
         }
 
         ListHeaderEntity e = service.createList(title, leftToRight);
-        return new Models.HeaderResponse(e.key, e.title, e.leftToRight);
+        return new Models.HeaderResponse(e.key, e.title, e.leftToRight, e.createdAt, e.updatedAt);
     }
 
     /**

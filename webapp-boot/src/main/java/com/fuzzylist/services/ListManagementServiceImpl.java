@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +67,10 @@ public class ListManagementServiceImpl implements ListManagementService {
                 .minLength(MIN_TITLE_LENGTH, "Title must be at least ${minLength} characters long.")
                 .maxLength(MAX_TEXT_LENGTH, "Title can be up to ${maxLength} characters long.");
 
-        ListHeaderEntity newList = new ListHeaderEntity(listKeyGenerator.generate(), title, leftToRight);
+        ListHeaderEntity newList = new ListHeaderEntity(listKeyGenerator.generate(),
+                title,
+                leftToRight,
+                now());
         listHeaderEntityRepository.save(newList);
         logger.info("Created a new list: '{}' with key '{}'.", title, newList.key);
 
@@ -87,9 +93,14 @@ public class ListManagementServiceImpl implements ListManagementService {
         // Fetch the list. It also makes to assert the list exists.
         ListHeaderEntity list = fetchList(listKey);
 
+        // Create a new text entry.
         int index = listEntryEntityRepository.findMaxListIndex(listKey).orElse(0) + 1;
         ListEntryEntity newText = new ListEntryEntity(list, index, text);
         listEntryEntityRepository.save(newText);
+
+        // Update list 'updated time' field.
+        list.updatedAt = now();
+        listHeaderEntityRepository.save(list);
 
         logger.info("Added text (size: {}) to list '{}'.", text.length(), listKey);
 
@@ -133,5 +144,12 @@ public class ListManagementServiceImpl implements ListManagementService {
         Assert.notNull(listKey, "List key cannot be null.");
         return listHeaderEntityRepository.findByKey(listKey)
                 .orElseThrow(() -> new UnknownListException("Unknown list: " + listKey));
+    }
+
+    /**
+     * @return Return date/time object adjusted to GMT (without timezone offset) aligned on seconds.
+     */
+    protected LocalDateTime now() {
+        return LocalDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.SECONDS);
     }
 }

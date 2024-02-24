@@ -1,5 +1,6 @@
 package com.fuzzylist.controllers.lists;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -37,8 +38,14 @@ public class Models {
      * @param key         List key - represents the public identifier of the list.
      * @param title       List title.
      * @param leftToRight {@code true} - if list should be displayed from left-to-right, {@code false} if right-to-left.
+     * @param createdAt   Date and time when the list was created.
+     * @param updatedAt   Date and time when the list was last updated.
      */
-    public record HeaderResponse(String key, String title, Boolean leftToRight) {
+    public record HeaderResponse(String key,
+                                 String title,
+                                 Boolean leftToRight,
+                                 LocalDateTime createdAt,
+                                 LocalDateTime updatedAt) {
     }
 
     /**
