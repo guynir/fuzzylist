@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    environment {
+        // Our local Microk8s registry.
+        DOCKER_REPOSITORY_URL = "http://10.0.1.1:32000"
+        DATABASE_IMAGE_NAME = "postgresql:latest"
+    }
+
+    stages {
+        stage('Build PostgreSQL database image') {
+            steps {
+                dir ("sys/production/posrgresql") {
+                    script {
+                        def image = docker.build(env.DATABASE_IMAGE_NAME)
+                            docker.withRegistry(env.DOCKER_REPOSITORY_URL) {
+                                image.push()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

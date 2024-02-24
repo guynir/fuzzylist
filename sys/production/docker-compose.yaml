@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   database:
-    image: library/postgres:16.1
+    image: 10.100.102.75:32000/postgresql:latest
     ports:
       - "5432:${DATABASE_PORT:-5432}"
     volumes:
