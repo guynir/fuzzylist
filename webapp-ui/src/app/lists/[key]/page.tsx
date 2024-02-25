@@ -152,12 +152,15 @@ export default function ListPage({params}: { params: { key: string } }) {
                                     <div className="text-lg h-5">{errorMessage}</div>
                                 </div>
 
-                                {entries.map((v: EntryResponse) => {
-                                    return <div key={"text-" + v.id}>
-                                        <span className="pr-3">{v.index}.</span>
-                                        <span>{v.text}</span>
-                                    </div>
-                                })}
+                                <table className="table-auto align-top">
+                                    {entries.map((v: EntryResponse) => {
+                                        return <tr key={"text-" + v.id}>
+                                            <td className="align-top"><span className="pr-3">{v.index}.</span></td>
+                                            <td><span>{v.text}</span></td>
+                                        </tr>
+                                    })}
+                                </table>
+
                             </div>
                         </div>
                     </div>
