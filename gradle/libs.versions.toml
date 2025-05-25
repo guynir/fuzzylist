@@ -1,0 +1,8 @@
+[versions]
+
+[libraries]
+lombok = 'org.projectlombok:lombok:1.18.38'
+
+[bundles]
+
+[plugins]

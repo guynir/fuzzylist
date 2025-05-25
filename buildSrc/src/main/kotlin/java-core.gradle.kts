@@ -15,6 +15,10 @@ plugins {
 repositories {
     mavenCentral()
     gradlePluginPortal()
+    maven {
+        url = uri("https://maven.pkg.github.com/guynir/jack")
+    }
+
 }
 
 group = "com.fuzzylist"

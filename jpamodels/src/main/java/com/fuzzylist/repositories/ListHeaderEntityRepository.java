@@ -14,7 +14,7 @@ import java.util.Optional;
  * @author Guy Raz Nir
  * @since 2022/03/15
  */
-@Repository
+//@Repository
 public interface ListHeaderEntityRepository extends JpaRepository<ListHeaderEntity, Long> {
 
     /**

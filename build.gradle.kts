@@ -33,14 +33,14 @@ dockerCompose {
 //
 // Task for running database schema update.
 //
-tasks.create("updatedb") {
+tasks.register("updatedb") {
     dependsOn(project(":jpa-migration-tool").getTasksByName("updatedb", false))
 }
 
 //
 // Task for running database schema validation.
 //
-tasks.create("validatedb") {
+tasks.register("validatedb") {
     dependsOn(project(":jpa-migration-tool").getTasksByName("validatedb", false))
 }
 
@@ -67,7 +67,7 @@ flyway {
 //
 // Drops existing database and create an empty one.
 //
-tasks.create<RunSQL>("createDatabase") {
+tasks.register<RunSQL>("createDatabase") {
     doFirst {
         println(
             """
@@ -101,7 +101,7 @@ tasks.create<RunSQL>("createDatabase") {
 //
 // Database initialization -- creates a new database and apply all migrations.
 //
-tasks.create("initdb") {
+tasks.register("initdb") {
     dependsOn("createDatabase")
     dependsOn("flywayMigrate").mustRunAfter("createDatabase")
     dependsOn("flywayInfo").mustRunAfter("flywayMigrate")

@@ -10,6 +10,7 @@ rootProject.name = "parent"
 
 include("common")
 include("jpamodels")
+include("services")
 include("webapp-boot")
 
 include("jpa-migration-tool")

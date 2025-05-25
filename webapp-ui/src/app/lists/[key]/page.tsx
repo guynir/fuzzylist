@@ -115,25 +115,30 @@ export default function ListPage({params}: { params: { key: string } }) {
     }
 
     return (
-        <main className="flex flex-col min-h-screen items-center justify-between p-24">
-            <div className="w-full items-center max-w-2xl default-font">
+        <main className="flex flex-col min-h-screen items-center justify-between md:p-24">
+            <div className="w-full items-center min-w-8 max-w-2xl default-font">
                 {loadMessage == null ?
                     <div className="flex flex-row">
+
+                        {/* "Back to home page" arrow */}
                         <div className="py-3 px-3">
                             <div className="pi pi-arrow-circle-left"
                                  onClick={() => document.location.href = "/"}
                                  title="Back to home page">
                             </div>
                         </div>
+
                         <div className="w-full" dir={leftToRight ? "ltr" : "rtl"}>
+                            {/* List title */}
                             <div className="flex flex-col w-full py-0 font-secondary-header">
                                 {header?.title}
                             </div>
+
                             <div className="w-full">
                                 <div className="flex flex-row">
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col grow">
                                         <InputText id="listName" type="text"
-                                                   className="border-solid border-1 h-8 p-0 border-gray-200 rounded-sm w-96"
+                                                   className="grow border-solid border-1 h-8 p-0 border-gray-200 rounded-sm"
                                                    onKeyDown={handleKey}
                                                    ref={inputRef}/>
 

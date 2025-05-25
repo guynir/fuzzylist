@@ -6,7 +6,7 @@ package com.fuzzylist.common;
  * @author Guy Raz Nir
  * @since 2022/01/19
  */
-public class ApplicationException extends Exception {
+public class ApplicationException extends RuntimeException {
 
     public ApplicationException() {
         super();

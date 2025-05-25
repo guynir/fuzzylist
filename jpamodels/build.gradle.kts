@@ -11,4 +11,13 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.hsqldb:hsqldb")
     implementation(libs.commons.lang3)
+
+    //
+    // Lombok project.
+    //
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
 }

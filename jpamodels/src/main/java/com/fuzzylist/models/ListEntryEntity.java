@@ -23,7 +23,7 @@ public class ListEntryEntity extends ObjectBagAware {
     public ListHeaderEntity parent;
 
     /**
-     * Index of text within the table.
+     * Index of the text within the table.
      */
     @Column(nullable = false)
     public Integer index;

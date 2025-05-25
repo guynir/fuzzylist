@@ -191,7 +191,7 @@ public class SecureRandomIdGenerator implements IdGenerator {
     }
 
     /**
-     * Check if a given array of characters contain duplicates.
+     * Check if a given array of characters contains duplicates.
      *
      * @param chars Characters to examine.
      * @return {@code true} if array contain duplicates, {@code false} if all characters are unique.

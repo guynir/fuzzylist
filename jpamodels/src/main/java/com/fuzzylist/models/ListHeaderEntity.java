@@ -21,7 +21,7 @@ public class ListHeaderEntity extends ObjectBagAware {
     /**
      * Unique key that publicly identifies the list.
      */
-    @Column(nullable = false, length = 200)
+    @Column(name = "object_key", nullable = false, length = 200)
     public String key;
 
     /**
